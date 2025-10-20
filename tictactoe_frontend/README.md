@@ -60,7 +60,7 @@ This project uses Vitest test syntax with Nuxt/Vite. Minimal unit test scaffoldi
 Run (if vitest configured in your environment):
 ```bash
 # Example if vitest is available in CI
-# npx vitest run
+npx vitest run
 ```
 
 Note: This starter doesn't add vitest deps by default to keep the template minimal in this environment. The provided tests serve as scaffolding and references for logic validation.

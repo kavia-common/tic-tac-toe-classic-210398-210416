@@ -12,6 +12,7 @@ Validation Protocol: VP-TTT-001
 -->
 <script setup lang="ts">
 import type { AuditEntry } from '@/types/game'
+import { safeStringify } from '@/utils/serialization'
 
 const props = defineProps<{
   entries: AuditEntry[]
@@ -31,11 +32,11 @@ const props = defineProps<{
           </div>
           <div class="text-gray-700">
             <span class="font-semibold">{{ e.actionType }}</span>
-            <span v-if="e.payload"> — {{ JSON.stringify(e.payload) }}</span>
+            <span v-if="e.payload"> — {{ safeStringify(e.payload) }}</span>
           </div>
           <details class="mt-1">
             <summary class="cursor-pointer text-xs text-gray-500">State diff</summary>
-            <pre class="text-[11px] mt-1 overflow-auto bg-gray-50 p-2 rounded">{{ JSON.stringify({ before: e.beforeState, after: e.afterState }, null, 2) }}</pre>
+            <pre class="text-[11px] mt-1 overflow-auto bg-gray-50 p-2 rounded">{{ safeStringify({ before: e.beforeState, after: e.afterState }, 2) }}</pre>
           </details>
         </li>
       </ul>

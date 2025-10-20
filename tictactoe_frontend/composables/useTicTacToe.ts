@@ -21,7 +21,14 @@ const WIN_LINES: number[][] = [
 ]
 
 interface AuditApi {
+  /**
+   * Accepts entries where payload/before/after will be sanitized by the audit implementation.
+   * Implementations must not attempt to JSON.stringify reactive state directly.
+   */
   log: (entry: any) => void
+  /**
+   * Returns a deep, plain clone safe for serialization.
+   */
   snapshot: (state: Partial<GameState>) => Partial<GameState>
 }
 
