@@ -11,20 +11,41 @@ Validation Protocol: VP-TTT-001
 ============================================================================
 -->
 <script setup lang="ts">
-const props = defineProps<{
-  board: Array<'X' | 'O' | null>,
+import type { Cell } from '@/types/game'
+import { computed } from 'vue'
+
+/**
+ * Strictly type props with safe defaults and guard winningLine usage.
+ * - board: required 9-length array of 'X' | 'O' | null
+ * - disabled: optional boolean
+ * - winningLine: optional number[] | null, coerced to [] for DOM class logic
+ */
+const props = withDefaults(defineProps<{
+  board: Array<Cell>,
   disabled?: boolean,
   winningLine?: number[] | null
-}>()
+}>(), {
+  disabled: false,
+  winningLine: null,
+})
 
 const emit = defineEmits<{
   'cell-click': [index: number]
 }>()
 
+/**
+ * Prepare a Set for O(1) membership checks and to avoid calling includes on non-array.
+ * When winningLine is null/undefined or not an array, treat as empty.
+ */
+const winningSet = computed<Set<number>>(() => {
+  return Array.isArray(props.winningLine) ? new Set(props.winningLine) : new Set()
+})
+
 // PUBLIC_INTERFACE
 function onClickCell(index: number) {
   /** Handle safe cell click emitting only when allowed. */
   if (props.disabled) return
+  if (!Array.isArray(props.board) || index < 0 || index >= props.board.length) return
   if (props.board[index] !== null) return
   emit('cell-click', index)
 }
@@ -38,7 +59,8 @@ function onClickCell(index: number) {
       class="board-cell"
       :class="{
         disabled: props.disabled || value !== null,
-        win: props.winningLine && props.winningLine.includes(idx)
+        // Guarded: only highlight when winningSet contains the index
+        win: winningSet.has(idx)
       }"
       @click="onClickCell(idx)"
       :aria-label="`Cell ${idx + 1}`"
