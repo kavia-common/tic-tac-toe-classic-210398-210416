@@ -20,6 +20,11 @@ import { computed } from 'vue'
  * - disabled: optional boolean
  * - winningLine: optional number[] | null, coerced to [] for DOM class logic
  *
+ * Layout:
+ * - Uses Tailwind utilities: grid grid-cols-3 grid-rows-3 gap-2 w-full max-w-sm aspect-square
+ * - Each cell uses aspect-square to remain square and flex center for content.
+ * - A CSS fallback (.board-grid/.board-cell) exists in assets/tailwind.css for environments without Tailwind utilities.
+ *
  * Note: Avoid any JSON.stringify() or implicit stringification of reactive objects.
  * The template renders only primitive cell marks ('X' | 'O' | ''), ensuring hydration safety.
  */
@@ -63,15 +68,21 @@ function onClickCell(index: number) {
 </script>
 
 <template>
-  <div class="board-grid">
+  <!-- Board container enforces a strict 3x3 grid, square overall, with uniform gaps -->
+  <div
+    class="grid grid-cols-3 grid-rows-3 gap-2 w-full max-w-sm aspect-square mx-auto"
+    role="grid"
+    aria-label="Tic Tac Toe Board"
+  >
     <button
       v-for="(value, idx) in props.board"
       :key="idx"
-      class="board-cell"
+      role="gridcell"
+      class="aspect-square flex items-center justify-center text-3xl font-semibold border rounded-lg cursor-pointer select-none shadow-sm bg-gradient-to-br from-blue-500/10 to-gray-50"
       :class="{
-        disabled: props.disabled || value !== null,
-        // Guarded: only highlight when winningSet contains the index
-        win: winningSet.has(idx)
+        'opacity-60 cursor-not-allowed': props.disabled || value !== null,
+        'outline outline-2 outline-offset-0': winningSet.has(idx),
+        'outline-[#F59E0B] shadow-[0_0_0_3px_rgba(245,158,11,0.2)]': winningSet.has(idx)
       }"
       @click="onClickCell(idx)"
       :aria-label="`Cell ${idx + 1}`"
